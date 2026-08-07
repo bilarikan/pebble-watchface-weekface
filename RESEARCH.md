@@ -280,8 +280,12 @@ Radio group in settings:
 
 - **Weekday in date line** — Full (`Friday, …`) / Abbreviated (`Fri, …`) / Hidden
 - **Month in date line** — Full (`August`) / Abbreviated (`Aug`)
-- **Week / quarter-end indicator** — hide `W32/Q39` (left of indicator row)
-- **Day of year indicator** — hide `D219/R146` (right of indicator row)
+- **Indicator values individually** (split into four toggles 2026-08-07): week `W32`,
+  quarter-end `Q39`, day of year `D219`, days remaining `R146`. Each side of the indicator
+  row renders whichever of its two parts are enabled (`W32/Q39`, `W32`, `Q39`, or empty).
+- **Menu icon** (added 2026-08-07): 25×25 white calendar glyph (`resources/images/menu_icon.png`,
+  `menuIcon: true`) shown in the watch's face switcher. Note: the *phone app* list icon comes
+  from the app store listing, so sideloaded installs show a placeholder until published.
 
 ### Translations (added 2026-08-07, Timely-inspired)
 

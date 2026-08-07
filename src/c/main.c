@@ -25,7 +25,7 @@ static void prv_update_time_and_week(void) {
   WeekInfo wi = weeknum_get(t);
   int day_of_year = t->tm_yday + 1;
   int days_remaining = weeknum_days_in_year(1900 + t->tm_year) - day_of_year;
-  info_layer_set_visible(s->show_week, s->show_yday);
+  info_layer_set_visible(s->show_week, s->show_quarter, s->show_day, s->show_remaining);
   info_layer_set(wi.week, wi.quarter_end, day_of_year, days_remaining);
 }
 

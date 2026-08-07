@@ -4,7 +4,7 @@
 #include <string.h>
 
 // Bumped whenever the persisted struct layout changes
-#define SETTINGS_PERSIST_KEY 3
+#define SETTINGS_PERSIST_KEY 4
 #define PERSIST_MONTHS_FULL 10
 #define PERSIST_MONTHS_ABBR 11
 #define PERSIST_DAYS_FULL 12
@@ -62,7 +62,9 @@ static void prv_set_defaults(void) {
     .hourly_vibe = false,
     .conn_vibe = false,
     .show_week = true,
-    .show_yday = true,
+    .show_quarter = true,
+    .show_day = true,
+    .show_remaining = true,
     .weekday_style = WeekdayFull,
     .month_style = MonthFull,
   };
@@ -115,8 +117,14 @@ static void prv_inbox_received(DictionaryIterator *iter, void *context) {
   if ((t = dict_find(iter, MESSAGE_KEY_ShowWeek))) {
     s_settings.show_week = prv_tuple_int(t) != 0;
   }
-  if ((t = dict_find(iter, MESSAGE_KEY_ShowYday))) {
-    s_settings.show_yday = prv_tuple_int(t) != 0;
+  if ((t = dict_find(iter, MESSAGE_KEY_ShowQuarter))) {
+    s_settings.show_quarter = prv_tuple_int(t) != 0;
+  }
+  if ((t = dict_find(iter, MESSAGE_KEY_ShowDay))) {
+    s_settings.show_day = prv_tuple_int(t) != 0;
+  }
+  if ((t = dict_find(iter, MESSAGE_KEY_ShowRemaining))) {
+    s_settings.show_remaining = prv_tuple_int(t) != 0;
   }
   if ((t = dict_find(iter, MESSAGE_KEY_WeekdayStyle))) {
     s_settings.weekday_style = (WeekdayStyle)prv_tuple_int(t);

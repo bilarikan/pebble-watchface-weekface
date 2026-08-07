@@ -23,7 +23,9 @@
       "HourlyVibe",
       "ConnVibe",
       "ShowWeek",
-      "ShowYday",
+      "ShowQuarter",
+      "ShowDay",
+      "ShowRemaining",
       "WeekdayStyle",
       "MonthStyle",
       "MonthsFull[12]",
@@ -33,7 +35,14 @@
       "IndLetters[4]"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        }
+      ]
     }
   }
 }

@@ -26,7 +26,8 @@ returns when the Quick View dismisses.
 Configured from the Pebble phone app (Clay-generated page):
 
 - **Time format** — 12-hour, 24-hour, or military
-- **Display** — weekday full/abbreviated/hidden, month full/abbreviated, hide either indicator
+- **Display** — weekday full/abbreviated/hidden, month full/abbreviated, and individual
+  toggles for each indicator value (week, quarter-end, day of year, days remaining)
 - **Vibration** — on the hour, on connect/disconnect (both respect Quiet Time)
 - **Translations** — every weekday, month (full + abbreviated), and the four indicator
   letters (W/Q/D/R) can be renamed; abbreviated weekday names also label the calendar

@@ -23,8 +23,10 @@ typedef struct {
   TimeFormat time_format;
   bool hourly_vibe;
   bool conn_vibe;
-  bool show_week;  // W<n>/Q<n> indicator
-  bool show_yday;  // D<n>/R<n> indicator
+  bool show_week;       // W32
+  bool show_quarter;    // Q39
+  bool show_day;        // D219
+  bool show_remaining;  // R146
   WeekdayStyle weekday_style;
   MonthStyle month_style;
 } Settings;

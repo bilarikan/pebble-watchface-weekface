@@ -8,27 +8,42 @@ static GFont s_font;
 static int s_week, s_quarter_end;
 static int s_day_of_year, s_days_remaining;
 static bool s_show_week = true;
-static bool s_show_yday = true;
+static bool s_show_quarter = true;
+static bool s_show_day = true;
+static bool s_show_remaining = true;
+
+// "W32/Q39", "W32", or "Q39" depending on which parts are enabled
+static void prv_format_pair(char *buf, size_t len,
+                            bool first_on, IndicatorLetter first, int first_val,
+                            bool second_on, IndicatorLetter second, int second_val) {
+  buf[0] = '\0';
+  size_t n = 0;
+  if (first_on) {
+    n = snprintf(buf, len, "%s%d", settings_ind_letter(first), first_val);
+  }
+  if (second_on && n < len) {
+    snprintf(buf + n, len - n, "%s%s%d", first_on ? "/" : "",
+             settings_ind_letter(second), second_val);
+  }
+}
 
 static void prv_update_proc(Layer *layer, GContext *ctx) {
   GRect b = layer_get_bounds(layer);
   graphics_context_set_text_color(ctx, GColorWhite);
 
-  if (s_show_week) {
-    char week_text[32];
-    snprintf(week_text, sizeof(week_text), "%s%d/%s%d",
-             settings_ind_letter(IndWeek), s_week,
-             settings_ind_letter(IndQuarter), s_quarter_end);
-    graphics_draw_text(ctx, week_text, s_font, GRect(4, 0, b.size.w - 8, b.size.h),
+  char left[32];
+  prv_format_pair(left, sizeof(left), s_show_week, IndWeek, s_week,
+                  s_show_quarter, IndQuarter, s_quarter_end);
+  if (left[0]) {
+    graphics_draw_text(ctx, left, s_font, GRect(4, 0, b.size.w - 8, b.size.h),
                        GTextOverflowModeTrailingEllipsis, GTextAlignmentLeft, NULL);
   }
 
-  if (s_show_yday) {
-    char yday_text[32];
-    snprintf(yday_text, sizeof(yday_text), "%s%d/%s%d",
-             settings_ind_letter(IndDay), s_day_of_year,
-             settings_ind_letter(IndRemaining), s_days_remaining);
-    graphics_draw_text(ctx, yday_text, s_font, GRect(4, 0, b.size.w - 8, b.size.h),
+  char right[32];
+  prv_format_pair(right, sizeof(right), s_show_day, IndDay, s_day_of_year,
+                  s_show_remaining, IndRemaining, s_days_remaining);
+  if (right[0]) {
+    graphics_draw_text(ctx, right, s_font, GRect(4, 0, b.size.w - 8, b.size.h),
                        GTextOverflowModeTrailingEllipsis, GTextAlignmentRight, NULL);
   }
 }
@@ -57,9 +72,15 @@ void info_layer_set(int week, int quarter_end, int day_of_year, int days_remaini
   if (s_layer) layer_mark_dirty(s_layer);
 }
 
-void info_layer_set_visible(bool show_week, bool show_yday) {
-  if (s_show_week == show_week && s_show_yday == show_yday) return;
+void info_layer_set_visible(bool show_week, bool show_quarter, bool show_day,
+                            bool show_remaining) {
+  if (s_show_week == show_week && s_show_quarter == show_quarter &&
+      s_show_day == show_day && s_show_remaining == show_remaining) {
+    return;
+  }
   s_show_week = show_week;
-  s_show_yday = show_yday;
+  s_show_quarter = show_quarter;
+  s_show_day = show_day;
+  s_show_remaining = show_remaining;
   if (s_layer) layer_mark_dirty(s_layer);
 }

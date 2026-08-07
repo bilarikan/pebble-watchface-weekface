@@ -73,13 +73,25 @@ module.exports = [
       {
         type: 'toggle',
         messageKey: 'ShowWeek',
-        label: 'Week / quarter-end (W32/Q39)',
+        label: 'Week (W32)',
         defaultValue: true
       },
       {
         type: 'toggle',
-        messageKey: 'ShowYday',
-        label: 'Day of year (D219/R146)',
+        messageKey: 'ShowQuarter',
+        label: 'Quarter-end week (Q39)',
+        defaultValue: true
+      },
+      {
+        type: 'toggle',
+        messageKey: 'ShowDay',
+        label: 'Day of year (D219)',
+        defaultValue: true
+      },
+      {
+        type: 'toggle',
+        messageKey: 'ShowRemaining',
+        label: 'Days remaining in year (R146)',
         defaultValue: true
       }
     ]
