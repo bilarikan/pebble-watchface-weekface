@@ -1,0 +1,39 @@
+{
+  "name": "weekface",
+  "author": "Bilge Arikan",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {
+    "pebble-clay": "^1.0.4"
+  },
+  "pebble": {
+    "displayName": "Weekface",
+    "uuid": "2c25cc1d-0d12-4d0e-a061-d1d16939d846",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [
+      "TimeFormat",
+      "HourlyVibe",
+      "ConnVibe",
+      "ShowWeek",
+      "ShowYday",
+      "WeekdayStyle",
+      "MonthStyle",
+      "MonthsFull[12]",
+      "MonthsAbbr[12]",
+      "DaysFull[7]",
+      "DaysAbbr[7]",
+      "IndLetters[4]"
+    ],
+    "resources": {
+      "media": []
+    }
+  }
+}

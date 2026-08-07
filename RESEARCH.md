@@ -41,7 +41,7 @@ time + calendar face, **C is the recommended starting point** for full API acces
 
 ### Option A — Local SDK (recommended for full control)
 
-- **SDK version:** 4.9.148 (latest)
+- **SDK version:** 4.17 (latest as of 2026-08-07; requires pebble-tool ≥ 5.0.38 — older 5.0.35 fails SDK install with "unmet requirements")
 - **Platforms:** macOS, Linux, Windows (via WSL only — no native Windows install)
 
 **macOS dependency:**
@@ -95,14 +95,72 @@ pebble publish                    # publish to app store
 
 ## Publishing to the App Store
 
-1. Build (`pebble build`) or use CloudPebble
-2. `pebble publish` or CloudPebble publish flow
-3. System auto-generates screenshots and animated GIFs across all platforms
-4. **Quick View support is recommended** for all watchfaces
+App store: https://apps.repebble.com/ · Developer dashboard: https://developer.repebble.com/dashboard
 
-App store: https://apps.repebble.com/
+### Steps for this project (verified against pebble-tool 5.0.39, 2026-08-07)
 
-Developer dashboard: https://developer.repebble.com/dashboard
+1. **Authenticate** — `pebble login` (GitHub-backed). CI alternative: `PEBBLE_FIREBASE_ID_TOKEN`
+   env var / `--firebase-id-token`.
+2. **Finalize metadata** in `package.json` — `displayName` is **"Weekface" (final, confirmed
+   2026-08-07)**, `version`, `author`. The `uuid` identifies the app across releases: keep it
+   stable forever once published.
+3. **Confirm target platforms** — currently `emery` only. Adding `gabbro` (Round 2) later
+   means a round layout pass plus a republish.
+4. ~~Choose a license~~ — **MIT, chosen 2026-08-07** (`LICENSE` in repo root).
+5. ~~Prepare store icons~~ — done 2026-08-07: face capture with `12.4k` steps shown, padded
+   square. `docs/store/icon-large-144.png` and `docs/store/icon-small-48.png` (regenerate
+   from `docs/store/icon-square.png` if the store wants other sizes). Store screenshots in
+   `docs/store/`: `emery_1_default.png`, `emery_2_military_abbrev.png`,
+   `emery_3_minimal_12h.png`, `emery_4_translated.png` (Turkish) — named platform-first as
+   `pebble publish --screenshots` requires.
+6. **Build** — `pebble build` → `build/pebble-watchface-01.pbw`.
+7. **Test on real hardware** before submitting — `pebble install --cloudpebble` with the
+   phone app, exercise the settings page end-to-end (Clay → AppMessage → persistence).
+8. **Publish** — `pebble publish` from the project directory. First run creates the store
+   entry interactively (name, description, category = Faces, optional source URL, icons).
+   Useful flags: `--release-notes "..."`; releases are created as **drafts by default** —
+   pass `--is-published` to go live immediately. Rollover GIFs are auto-captured for all
+   supported platforms (`--no-gif-all-platforms` to skip; `--all-platforms` adds static
+   screenshots; manually supplied files must be named like `emery_screenshot.png`).
+9. **Review the listing** in the developer dashboard and flip the draft release to published.
+10. **Updates** — bump `version` in `package.json`, rebuild, `pebble publish --release-notes "..."`.
+
+Quick View: **implemented 2026-08-07** via the unobstructed-area service — when the timeline
+Quick View covers the bottom of the screen, the calendar hides entirely (rather than showing
+clipped rows) and the status bar / date / time / indicator rows remain fully visible; the
+calendar returns when the Quick View dismisses. Verified in the emulator with
+`pebble emu-set-timeline-quick-view on|off`.
+
+### App store description (draft)
+
+**Short/tagline:** Time, a three-week calendar, and the numbers that structure your year.
+
+**Full description:**
+
+> Weekface is a clean, information-dense watchface built around how weeks structure a year.
+>
+> TOP TO BOTTOM
+> • Status bar — battery, Bluetooth (shown while connected), and today's step count
+> • Full date — Friday, August 07, 2026
+> • Big, readable time
+> • Week indicator — W32/Q39: the current ISO week and the closing week of its 13-week quarter
+> • Year progress — D219/R146: day of the year and days remaining
+> • Three-week calendar — last week, this week (today highlighted), next week. Monday-first,
+>   always in agreement with the ISO week number.
+>
+> SETTINGS (from the Pebble app)
+> • 12-hour, 24-hour, or military time (1305)
+> • Full, abbreviated, or hidden weekday; full or abbreviated month
+> • Show or hide the week and day-of-year indicators
+> • Hourly and connect/disconnect vibrations — both respect Quiet Time
+> • Full translations: rename every weekday, month, and indicator letter in your language;
+>   the calendar header follows automatically
+>
+> No weather, no network needed, no branding splash. Just the face.
+>
+> Designed for Pebble Time 2.
+
+Category: **Faces**.
 
 ---
 
@@ -161,15 +219,16 @@ Current UI requirements for the new watchface (superseding the generic "Battery 
 
 | Element | Old behavior (Timely-style) | New behavior |
 |---|---|---|
-| Bluetooth | Icon + "no link" text, always visible | Small icon only, no text label. Shown only when there is no phone connection; hidden while connected. |
+| Bluetooth | Icon + "no link" text, always visible | Small icon only, no text label. Shown while the watch is connected to a phone/device via Bluetooth; hidden when disconnected or in airplane mode. *(Inverted from the earlier draft of this spec — confirmed 2026-08-07.)* |
 | Battery | Larger icon with a percentage number | Small vertical battery icon, no percentage digits, moved to the left next to the Bluetooth icon |
 | Steps | *(new)* | Fills the horizontal space vacated by the battery indicator's old position — see formatting rules below |
 | UTC | Present | Removed entirely |
 
-**Open question on the Bluetooth trigger:** the request says "when the watch is in airplane mode."
-This is being read as "no phone connection" (the standard `bluetooth_connection_service` disconnected
-callback), same condition Timely's "no link" text used. Flag for correction if a literal Airplane
-Mode radio-off toggle is meant instead of a disconnected-but-radio-on state.
+**Resolved (2026-08-07):** the Bluetooth icon indicates a *live connection* — shown when the watch
+is connected to a phone/device via Bluetooth, hidden when disconnected or in airplane mode. This is
+the inverse of Timely's "no link" indicator. Implemented with the standard connection service
+callback (`connection_service` connected/disconnected events); no separate airplane-mode detection
+exists in the SDK, and none is needed since airplane mode simply reads as disconnected.
 
 ### Steps counter formatting
 
@@ -178,7 +237,25 @@ Mode radio-off toggle is meant instead of a disconnected-but-radio-on state.
 - Data source: Pebble HealthService (`health_service_*` APIs). Confirm step data is actually
   available on the older hardware Timely supports (OG Pebble/Steel predate HealthService).
 
+### Vertical layout (updated 2026-08-07 after first build review)
+
+Top to bottom:
+
+1. **Status bar** — battery + Bluetooth icons (left), steps (right)
+2. **Full date line** — `Friday, August 07, 2026` (weekday, month, zero-padded day, year)
+3. **Time** — large digits
+4. **Indicator row** — week/quarter-end (left) and day-of-year/days-remaining (right)
+5. **3-week calendar**
+
+### Day of year / days remaining indicator
+
+Format: `D<day of year>/R<days remaining>` — e.g. `D219/R146` on 2026-08-07 (day 219, 146 left).
+Carried over from Timely. Right-aligned on the indicator row, opposite the week indicator.
+
 ### Week indicator: week + quarter-end week
+
+Position: left side of the indicator row between the time and the calendar (moved out of the
+status bar, where it originally sat centered).
 
 Format: `W<current ISO week>/Q<quarter-end week>`
 
@@ -190,11 +267,37 @@ Format: `W<current ISO week>/Q<quarter-end week>`
   - `W2/Q13` (week 2 → Q1 ends week 13)
   - `W15/Q26` (week 15 → Q2 ends week 26)
 
-### Time format option
+### Time format option (updated 2026-08-07: now three-way)
 
-- Add a settings toggle for **military time** — no colon, e.g. `1113`
-- Keep the existing **24-hour** format as the other option — with colon, e.g. `11:13`
-- Both are 24-hour clocks; the toggle only changes the separator
+Radio group in settings:
+
+- **12-hour** — colon, leading zero stripped, no AM/PM marker: `1:05`
+- **24-hour** (default) — colon: `13:05`
+- **Military** — 24-hour, no colon: `1305`
+
+### Display options (added 2026-08-07)
+
+- **Weekday in date line** — Full (`Friday, …`) / Abbreviated (`Fri, …`) / Hidden
+- **Month in date line** — Full (`August`) / Abbreviated (`Aug`)
+- **Week / quarter-end indicator** — hide `W32/Q39` (left of indicator row)
+- **Day of year indicator** — hide `D219/R146` (right of indicator row)
+
+### Translations (added 2026-08-07, Timely-inspired)
+
+Text fields in settings for all four name sets: 7 full weekdays, 7 abbreviated weekdays
+(max 5 chars), 12 full months, 12 abbreviated months — plus the four indicator prefix
+letters (W/Q/D/R, max 3 chars each, e.g. Turkish `H32/Ç39` and `G219/K146`).
+Defaults are English. The abbreviated
+weekday names also drive the calendar header (first two characters, UTF-8-aware). Stored on
+the watch across four persist keys (each name group must stay under the 256-byte persist
+entry limit). Empty fields keep their previous value.
+
+Timely's full settings inventory (for future inspiration): dark/light theme; per-event vibration
+*patterns* (none/1x/2x/3x/long/… for hourly, connect, disconnect); translation text fields for
+day/month names and status labels; US vs. European date format; three configurable indicator
+slots below the time (week / timezone / AM-PM / day); week numbering scheme (ISO 8601 vs.
+Sun-first vs. Mon-first); calendar options — invert today, grid lines on/off, week start on any
+day of the week.
 
 ### App-return behavior
 
@@ -274,13 +377,13 @@ Timely's raw HTML page. Settings for this watchface (status bar element toggles,
 
 - [x] Reference watchface chosen: **Timely** (PebbleTimely) — replaces the earlier ForecasWatch2 candidate, used as reference/inspiration only, not a base to fork
 - [x] Settings UI approach: not framework-mandated — leaning **Clay** over Timely's hand-rolled HTML page
-- [ ] Choose language: C (recommended — full API, more tutorials) vs JavaScript/Alloy
-- [ ] Decide on local SDK vs CloudPebble for development
+- [x] Choose language: **C** (full API, more tutorials)
+- [x] Decide on local SDK vs CloudPebble: **local SDK** — pebble-tool 5.0.39 + SDK 4.17 installed 2026-08-07
 - [ ] Walk through C watchface tutorial Parts 1 & 5
 - [ ] Study `Timely.c` / `js/` to understand time + calendar rendering — for reference only; the actual implementation will be original code, split into clear layers rather than mirroring Timely's monolithic structure
-- [ ] Determine which Pebble hardware to target (Time 2 rectangular, Round 2, or both)
-- [ ] Confirm the Bluetooth-icon trigger condition (disconnected vs. literal Airplane Mode) — see Design Specification section
-- [ ] Confirm HealthService step-count availability across target hardware (older Pebbles may lack it)
-- [ ] Assess Quick View support requirements for the planned design
+- [x] Determine which Pebble hardware to target: **Time 2 (rectangular) first**; Round 2 possibly later
+- [x] Confirm the Bluetooth-icon trigger condition: **icon shown while connected**, hidden when disconnected or in airplane mode — see Design Specification section
+- [x] Confirm HealthService step-count availability: not a concern — targeting Time 2 only, which has HealthService
+- [x] Assess Quick View support requirements: **implemented** — calendar hides under Quick View, top rows stay visible
 - [ ] Check the Figma PebbleOS design elements template before starting UI work
-- [ ] Decide on calendar scope: Timely defaults to 3 weeks (configurable) — consider if that's the right amount
+- [x] Decide on calendar scope: **3 weeks, fixed** (prev / current / next week)
