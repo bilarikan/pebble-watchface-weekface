@@ -97,6 +97,11 @@ pebble publish                    # publish to app store
 
 App store: https://apps.repebble.com/ · Developer dashboard: https://developer.repebble.com/dashboard
 
+**PUBLISHED 2026-08-07** (v1.0.0, as a draft release): store entry created via
+`pebble publish --non-interactive` with the description below, icons, and the four
+screenshots. **App page: https://apps.repebble.com/86b944d8971e4df2a392dfad** — review the
+listing in the developer dashboard and flip the release to publicly visible.
+
 ### Steps for this project (verified against pebble-tool 5.0.39, 2026-08-07)
 
 1. **Authenticate** — `pebble login` (GitHub-backed). CI alternative: `PEBBLE_FIREBASE_ID_TOKEN`
@@ -138,7 +143,7 @@ calendar returns when the Quick View dismisses. Verified in the emulator with
 
 **Full description:**
 
-> Weekface is a clean, information-dense watchface built around how weeks structure a year.
+> Weekface is a clean, information-dense watchface built around how the days, weeks, and quarters structure your year.
 >
 > TOP TO BOTTOM
 > • Status bar — battery, Bluetooth (shown while connected), and today's step count
@@ -157,7 +162,7 @@ calendar returns when the Quick View dismisses. Verified in the emulator with
 > • Full translations: rename every weekday, month, and indicator letter in your language;
 >   the calendar header follows automatically
 >
-> No weather, no network needed, no branding splash. Just the face.
+> No weather, no network needed. Just the face.
 >
 > Designed for Pebble Time 2.
 
