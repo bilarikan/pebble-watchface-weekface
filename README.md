@@ -6,6 +6,8 @@ calendar — with the status bar (battery, bluetooth, steps) on top.
 
 ![Weekface on the emery emulator](docs/screenshot.png)
 
+Try in browser or install on watch [Repebble.com Weekface](https://apps.repebble.com/weekface_86b944d8971e4df2a392dfad)
+
 ## Layout
 
 Top to bottom:
