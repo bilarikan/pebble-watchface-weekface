@@ -118,6 +118,7 @@ App store: https://apps.repebble.com/ · Developer dashboard: https://developer.
    phone app, exercise the settings page end-to-end (Clay → AppMessage → persistence).
 8. **Publish** — `pebble publish` from the project directory. First run creates the store
    entry interactively (name, description, category = Faces, optional source URL, icons).
+   Source URL for the listing: https://github.com/bilarikan/pebble-watchface-weekface
    Useful flags: `--release-notes "..."`; releases are created as **drafts by default** —
    pass `--is-published` to go live immediately. Rollover GIFs are auto-captured for all
    supported platforms (`--no-gif-all-platforms` to skip; `--all-platforms` adds static
